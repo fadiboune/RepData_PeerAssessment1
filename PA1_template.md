@@ -1,9 +1,4 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
----
+# Reproducible Research: Peer Assessment 1
 ## Introduction
 It is now possible to collect a large amount of data about personal movement using activity monitoring devices such as a Fitbit, Nike Fuelband, or Jawbone Up. These type of devices are part of the "quantified self" movement - a group of enthusiasts who take measurements about themselves regularly to improve their health, to find patterns in their behavior, or because they are tech geeks. But these data remain under-utilized both because the raw data are hard to obtain and there is a lack of statistical methods and software for processing and interpreting the data.
 
@@ -20,12 +15,14 @@ The variables included in this dataset are:
 ## Loading and preprocessing the data
 
 *load the required library for future plots*
-``` {r}
+
+```r
 library(ggplot2)
 ```
 
 first unzipping the file, then reading the data
-``` {r echo=TRUE}
+
+```r
 unzip("activity.zip", files="activity.csv")
 actData<- read.csv("activity.csv")
 ```
@@ -33,15 +30,30 @@ actData<- read.csv("activity.csv")
 
 ## What is mean total number of steps taken per day?
 The total number of steps taken per day is calculated below and plotted as an histogram.
-``` {r echo=TRUE}
+
+```r
 sumData<- aggregate(steps ~ date, actData, sum, na.rm=T)
 hist(sumData$steps, breaks=50, col="violetred")
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-3-1.png)
+
 The mean and median value are:
-``` {r echo=TRUE}
+
+```r
 print(paste0("mean = ",round(mean(sumData$steps)), " steps"))
+```
+
+```
+## [1] "mean = 10766 steps"
+```
+
+```r
 print(paste0("mean = ",round(median(sumData$steps)), " steps"))
+```
+
+```
+## [1] "mean = 10765 steps"
 ```
 
 ## What is the average daily activity pattern?
