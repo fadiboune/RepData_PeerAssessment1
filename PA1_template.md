@@ -4,7 +4,7 @@ It is now possible to collect a large amount of data about personal movement usi
 
 This assignment makes use of data from a personal activity monitoring device. This device collects data at 5 minute intervals through out the day. The data consists of two months of data from an anonymous individual collected during the months of October and November, 2012 and include the number of steps taken in 5 minute intervals each day.
 
-The data for this assignment were downloaded from <https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip> on 05/04/2016 22:00.
+The data for this assignment were downloaded from <https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip> on 05/04/2016 22:00. Data file is also available in the repository.
 
 The variables included in this dataset are:
 
@@ -41,7 +41,7 @@ hist(sumData$steps, breaks=50, col="violetred")
 The mean and median value are:
 
 ```r
-print(paste0("mean = ",round(mean(sumData$steps)), " steps"))
+print(paste0("mean = ", round(mean(sumData$steps)), " steps"))
 ```
 
 ```
@@ -49,15 +49,36 @@ print(paste0("mean = ",round(mean(sumData$steps)), " steps"))
 ```
 
 ```r
-print(paste0("mean = ",round(median(sumData$steps)), " steps"))
+print(paste0("median = ", round(median(sumData$steps)), " steps"))
 ```
 
 ```
-## [1] "mean = 10765 steps"
+## [1] "median = 10765 steps"
 ```
 
 ## What is the average daily activity pattern?
+Calculate the average number of steps (averaged across all days) for each 5-minute interval, and make a simple line plot:
 
+```r
+intervalData<- aggregate(steps ~ interval, actData, mean)
+plot(intervalData, type="l")
+```
+
+![](PA1_template_files/figure-html/unnamed-chunk-5-1.png)
+
+and caclutate the interval for which the average number of steps is the highest:
+
+```r
+max<- which.max(intervalData$steps)
+hourMax<- intervalData$interval[max]
+hh<- hourMax%/%100
+mm<- hourMax%%100
+print(paste0("maximum averaged steps at ",hh,":",mm))
+```
+
+```
+## [1] "maximum averaged steps at 8:35"
+```
 
 
 ## Imputing missing values
