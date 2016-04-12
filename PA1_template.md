@@ -41,7 +41,9 @@ hist(sumData$steps, breaks=50, col="violetred")
 The mean and median value are:
 
 ```r
-print(paste0("mean = ", round(mean(sumData$steps)), " steps"))
+meanAct<- round(mean(sumData$steps))
+medianAct<- round(median(sumData$steps))
+print(paste0("mean = ", meanAct, " steps"))
 ```
 
 ```
@@ -49,7 +51,7 @@ print(paste0("mean = ", round(mean(sumData$steps)), " steps"))
 ```
 
 ```r
-print(paste0("median = ", round(median(sumData$steps)), " steps"))
+print(paste0("median = ", medianAct, " steps"))
 ```
 
 ```
@@ -60,7 +62,7 @@ print(paste0("median = ", round(median(sumData$steps)), " steps"))
 Calculate the average number of steps (averaged across all days) for each 5-minute interval, and make a simple line plot:
 
 ```r
-intervalData<- aggregate(steps ~ interval, actData, mean)
+intervalData<- aggregate(steps ~ interval, actData, mean, na.rm=T)
 plot(intervalData, type="l")
 ```
 
@@ -80,9 +82,56 @@ print(paste0("maximum averaged steps at ",hh,":",mm))
 ## [1] "maximum averaged steps at 8:35"
 ```
 
-
 ## Imputing missing values
 
+The position of missing values in the dataset is stored in `missVal` and the total number of NA is calculated:
 
+```r
+missVal<- is.na(actData)
+print(sum(missVal))
+```
+
+```
+## [1] 2304
+```
+
+The strategy chosen is to fill missing values with 5-minute interval means (previously calculated and stored in `ìntervalData`). A new dataframe is created (`actDataMiss`) and the missing values are replaced:
+
+```r
+actDataMiss<- actData
+pos<- which(missVal)
+for (i in pos) {
+      interv<- actDataMiss$interval[i]
+      numRow<- which(intervalData$interval==interv)
+      actDataMiss$steps[i]<- intervalData$steps[numRow]
+}
+```
+
+The incidence of replacing NA value is evaluated by plotting the number of steps taken each day, calculating mean and median values, and comparing them with the value obtained with no NA replacement:
+
+```r
+sumDataMiss<- aggregate(steps ~ date, actDataMiss, sum)
+hist(sumDataMiss$steps, breaks=50, col="seagreen")
+```
+
+![](PA1_template_files/figure-html/unnamed-chunk-9-1.png)
+
+The mean and median value are compared:
+
+```r
+meanActMiss<- round(mean(sumDataMiss$steps))
+medianActMiss<- round(median(sumDataMiss$steps))
+comp<- data.frame(row.names = c("removing NA values", "replacing NAs by 5-min interval mean"), c(meanAct, medianAct), c(meanActMiss, medianActMiss))
+names(comp)<- c("mean", "median")
+print(comp)
+```
+
+```
+##                                       mean median
+## removing NA values                   10766  10766
+## replacing NAs by 5-min interval mean 10765  10766
+```
+
+The mean and median values obtained are similar without or with replacing NA values by 5-min interval means. The shapes of histogram are also similar. This makes senses because NA values in the dataset are observed for whole days. Thus, by substituting NA values by 5-min means over all days , the same histogram profile is kept. Only the highest frequency values are increased.
 
 ## Are there differences in activity patterns between weekdays and weekends?
