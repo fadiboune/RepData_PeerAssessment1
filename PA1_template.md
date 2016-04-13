@@ -132,6 +132,25 @@ print(comp)
 ## replacing NAs by 5-min interval mean 10765  10766
 ```
 
-The mean and median values obtained are similar without or with replacing NA values by 5-min interval means. The shapes of histogram are also similar. This makes senses because NA values in the dataset are observed for whole days. Thus, by substituting NA values by 5-min means over all days , the same histogram profile is kept. Only the highest frequency values are increased.
+The two histograms are compared below:
+
+```r
+par(mfrow=c(2,1))
+hist(sumData$steps, breaks=50, col="violetred")
+hist(sumDataMiss$steps, breaks=50, col="seagreen")
+```
+
+![](PA1_template_files/figure-html/unnamed-chunk-11-1.png)
+
+The mean and median values obtained are similar without or with replacing NA values by 5-min interval means. The shapes of histogram are also similar. This makes senses because NA values in the dataset are observed for whole days (*see the plot below, where the sum of NA values is plotted as a function of the date*). Thus, by substituting NA values by 5-min means over all days , the same histogram profile is kept. Only the frequency values are increased.
+
+
+```r
+par(mfrow=c(1,1))
+NAsum<- aggregate(is.na(steps) ~ date, actData, sum)
+plot(NAsum)
+```
+
+![](PA1_template_files/figure-html/unnamed-chunk-12-1.png)
 
 ## Are there differences in activity patterns between weekdays and weekends?
