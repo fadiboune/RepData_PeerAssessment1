@@ -12,15 +12,19 @@ The variables included in this dataset are:
 * date: The date on which the measurement was taken in YYYY-MM-DD format
 * interval: Identifier for the 5-minute interval in which measurement was taken
 
+***
+
 ## Loading and preprocessing the data
 
-*load the required library for future plots*
+*load the required libraries*
 
 ```r
-library(ggplot2)
+require(ggplot2)
+require(lubridate)
+require(dplyr)
 ```
 
-first unzipping the file, then reading the data
+first unzipping the file, then reading the data.
 
 ```r
 unzip("activity.zip", files="activity.csv")
@@ -33,7 +37,7 @@ The total number of steps taken per day is calculated below and plotted as an hi
 
 ```r
 sumData<- aggregate(steps ~ date, actData, sum, na.rm=T)
-hist(sumData$steps, breaks=50, col="violetred")
+hist(sumData$steps, breaks=50, col="violetred", main="total steps taken")
 ```
 
 ![](PA1_template_files/figure-html/unnamed-chunk-3-1.png)
@@ -111,7 +115,7 @@ The incidence of replacing NA value is evaluated by plotting the number of steps
 
 ```r
 sumDataMiss<- aggregate(steps ~ date, actDataMiss, sum)
-hist(sumDataMiss$steps, breaks=50, col="seagreen")
+hist(sumDataMiss$steps, breaks=50, col="seagreen", main="total steps taken - NA values replaced")
 ```
 
 ![](PA1_template_files/figure-html/unnamed-chunk-9-1.png)
@@ -136,21 +140,42 @@ The two histograms are compared below:
 
 ```r
 par(mfrow=c(2,1))
-hist(sumData$steps, breaks=50, col="violetred")
-hist(sumDataMiss$steps, breaks=50, col="seagreen")
+hist(sumData$steps, breaks=50, col="violetred",
+     main="total steps taken - NA values removed",
+     xlab="total steps")
+hist(sumDataMiss$steps, breaks=50, col="seagreen",
+     main="total steps taken - Na values replaced",
+     xlab="total steps")
 ```
 
 ![](PA1_template_files/figure-html/unnamed-chunk-11-1.png)
 
-The mean and median values obtained are similar without or with replacing NA values by 5-min interval means. The shapes of histogram are also similar. This makes senses because NA values in the dataset are observed for whole days (*see the plot below, where the sum of NA values is plotted as a function of the date*). Thus, by substituting NA values by 5-min means over all days , the same histogram profile is kept. Only the frequency values are increased.
+The mean and median values obtained are similar without or with replacing NA values by 5-min interval means. The shapes of histogram are also similar. This makes senses because NA values in the dataset are observed for whole days (*see the plot below, where the percent of NA values is plotted as a function of the date*). Thus, by substituting NA values by 5-min means over all days , the same histogram profile is kept. Only the frequency values are increased.
 
 
 ```r
 par(mfrow=c(1,1))
-NAsum<- aggregate(is.na(steps) ~ date, actData, sum)
-plot(NAsum)
+NAsum<- aggregate((100*is.na(steps)/nrow(intervalData)) ~ date, actData, sum)
+plot(NAsum, main="percent of NA value by date", ylab="% of NA value")
 ```
 
 ![](PA1_template_files/figure-html/unnamed-chunk-12-1.png)
 
 ## Are there differences in activity patterns between weekdays and weekends?
+
+A new factor variable in added to the dataset, indicating wether a given date is a weekday or a weekend day. Then, the average number of steps taken is calculated and plotted as a function of the 5-minute interval, for weekdays and weekend days.
+
+```r
+actDataMiss$date<- ymd(actDataMiss$date)
+actDataMissDay<- mutate(actDataMiss, day=factor(wday(date) %in% c(2:6), labels=c("weekend", "weekday")))
+intervalDay<- aggregate(steps ~ interval + day, actDataMissDay, mean)
+plot<- ggplot(intervalDay, aes(interval, steps))+
+      geom_line(size = 1)+
+      facet_grid(day ~.)+
+      labs(x="5-minute interval", y="average number of steps")
+print(plot)
+```
+
+![](PA1_template_files/figure-html/unnamed-chunk-13-1.png)
+
+There is a difference in the pattern of the plots between weekdays and weekend days. In particular, the increasing of the total number of steps taken observed around 8:00 am is greater during weekdays. This could match the hours when people accompany their children to school and/or go to work. However, during weekend days, a higher activity is observed from 10:00 to the end of the day.
